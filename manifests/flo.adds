@@ -75,5 +75,12 @@
         "repository":   "proprietary_vendor_asus",
         "target_path":  "vendor/asus",
         "revision":     "jb43"
+    },
+    {
+        "remote":       "github",
+        "account":      "CyanogenMod",
+        "repository":   "android_kernel_google_msm",
+        "target_path":  "kernel/google/msm",
+        "revision":     "cm-10.2"
     }
 ]
