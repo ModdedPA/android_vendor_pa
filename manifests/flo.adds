@@ -7,10 +7,12 @@
         "revision":     "refs/tags/android-4.3_r2.2"
     },
     {
-        "remote":       "aosp",
-        "repository":   "kernel/msm",
+        "remote":       "github",
+        "remote":       "cm",
+        "account":      "CyanogenMod",
+        "repository":   "android_kernel_google_msm",
         "target_path":  "kernel/google/msm",
-        "revision":     "android-msm-flo-3.4-jb-mr2"
+        "revision":     "cm-10.2"
     },
     {
         "remote":       "cm",
