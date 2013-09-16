@@ -29,9 +29,10 @@ PRODUCT_COPY_FILES += \
 # Bring in all video files
 $(call inherit-product, frameworks/base/data/videos/VideoPackage2.mk)
 
-# Exclude prebuilt paprefs from builds if the flag is set
+# PA apk's
 PRODUCT_COPY_FILES += \
-    vendor/pa/prebuilt/common/apk/ParanoidPreferences.apk:system/app/ParanoidPreferences.apk
+    vendor/pa/prebuilt/common/apk/ParanoidPreferences.apk:system/app/ParanoidPreferences.apk \
+    vendor/pa/prebuilt/common/apk/ParanoidWallpapers.apk:system/app/ParanoidWallpapers.apk
 
 # ParanoidOTA
 ifneq ($(NO_OTA_BUILD),true)
