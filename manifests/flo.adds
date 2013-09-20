@@ -4,7 +4,7 @@
         "account":      "device",
         "repository":   "asus/flo-kernel",
         "target_path":  "device/asus/flo-kernel",
-        "revision":     "refs/tags/android-4.3_r2.2"
+        "revision":     "refs/tags/android-4.3_r3.1"
     },
     {
         "remote":       "cm",
