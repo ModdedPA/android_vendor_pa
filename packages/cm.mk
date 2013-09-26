@@ -32,6 +32,7 @@ PRODUCT_PACKAGES += \
     ntfsfix \
     ntfs-3g \
     BluetoothExt \
+    CMFileManager
 
 # Openssh
 PRODUCT_PACKAGES += \
