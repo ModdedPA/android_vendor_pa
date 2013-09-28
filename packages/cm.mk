@@ -31,8 +31,7 @@ PRODUCT_PACKAGES += \
     mkfs.exfat \
     ntfsfix \
     ntfs-3g \
-    BluetoothExt \
-    CMFileManager
+    BluetoothExt
 
 # Openssh
 PRODUCT_PACKAGES += \

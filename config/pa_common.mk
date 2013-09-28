@@ -40,6 +40,12 @@ ifneq ($(NO_OTA_BUILD),true)
         ParanoidOTA
 endif
 
+# Additional Stuff
+PRODUCT_PACKAGES += \
+    CMFileManager \
+    Apollo \
+    DSPManager
+
 ifneq ($(PARANOID_BOOTANIMATION_NAME),)
     PRODUCT_COPY_FILES += \
         vendor/pa/prebuilt/common/bootanimation/$(PARANOID_BOOTANIMATION_NAME).zip:system/media/bootanimation.zip
