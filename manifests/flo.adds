@@ -70,6 +70,12 @@
         "revision":     "refs/tags/android-4.3_r3.1"
     },
     {
+        "remote":       "aosp",
+        "repository":   "kernel/msm",
+        "target_path":  "kernel/google/msm",
+        "revision":     "android-msm-flo-3.4-jb-mr2"
+    },
+    {
         "remote":       "github",
         "account":      "ParanoidAndroid",
         "repository":   "proprietary_vendor_asus",
