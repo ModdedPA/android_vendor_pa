@@ -6,44 +6,45 @@
 
 OUT_TARGET_HOST=`uname -a | grep Darwin`
 if [ -z "$OUT_TARGET_HOST" ]; then
-	OUT_TARGET_HOST=linux-x86
-	MD5=md5sum
-	XARGS="xargs --max-args=1 --max-procs `grep 'processor' /proc/cpuinfo|wc -l`"
-	SED=sed
+        OUT_TARGET_HOST=linux-x86
+        MD5=md5sum
+        XARGS="xargs --max-args=1 --max-procs `grep 'processor' /proc/cpuinfo|wc -l`"
+        SED=sed
 else
-	OUT_TARGET_HOST=darwin-x86
-	MD5=md5
-	XARGS="xargs -n 1 -P `sysctl hw.ncpu | awk '{print $2}'`"
-	SED=gsed
+        OUT_TARGET_HOST=darwin-x86
+        MD5=md5
+        XARGS="xargs -n 1 -P `sysctl hw.ncpu | awk '{print $2}'`"
+        SED=gsed
 fi
 
 if [ -z "$OUT" -o ! -d "$OUT" ]; then
-	echo "ERROR: $0 only works with a full build environment. $OUT should exist."
-	exit 1
+        echo "ERROR: $0 only works with a full build environment. $OUT should exist."
+        exit 1
 fi
 
 if [ "$TARGET_BUILD_TYPE" = "debug" ]; then
-	OTAPACKAGE=$OUT/${TARGET_PRODUCT}_debug-ota-$TARGET_BUILD_VARIANT.$USER.zip
+        OTAPACKAGE=$OUT/${TARGET_PRODUCT}_debug-ota-$TARGET_BUILD_VARIANT.$USER.zip
 elif [ "$TARGET_BUILD_VARIANT" = "userdebug" ]; then
-	OTAPACKAGE=$OUT/$TARGET_PRODUCT-ota-eng.$USER.zip
+        OTAPACKAGE=$OUT/$TARGET_PRODUCT-ota-eng.$USER.zip
 else
-	OTAPACKAGE=$OUT/$TARGET_PRODUCT-ota-$TARGET_BUILD_VARIANT.$USER.zip
+        OTAPACKAGE=$OUT/$TARGET_PRODUCT-ota-$TARGET_BUILD_VARIANT.$USER.zip
 fi
 
 if [ ! -f "$OTAPACKAGE" ]; then
-	echo "$OTAPACKAGE doesn't exist!";
-	exit 1
+        echo "$OTAPACKAGE doesn't exist!";
+        exit 1
 fi
 
 OPTICHARGER=$ANDROID_BUILD_TOP/vendor/pa/tools/opticharger
 QUIET=-q
 DELETE_BINS="applypatch applypatch_static check_prereq recovery updater"
-REPACK=$OUT/repack.d
 
+REPACK=$OUT/repack.d
 printf "Sanitizing environment..."
 rm -rf $REPACK
 mkdir -p $REPACK
 echo
+
 
 # Unpack the otapackage and opticharge all apks
 mkdir $REPACK/ota
@@ -60,22 +61,22 @@ find ./ -name \*.apk | $XARGS $OPTICHARGER
 
 # Fix build.prop
 $SED -i \
-	-e '/ro\.kernel\.android\.checkjni/d' \
-	-e '/ro\.build\.type/s/eng/user/' \
-	$REPACK/ota/system/build.prop
+        -e '/ro\.kernel\.android\.checkjni/d' \
+        -e '/ro\.build\.type/s/eng/user/' \
+        $REPACK/ota/system/build.prop
 
 # Delete ParanoidAndroid specific files
 if [ -f $ANDROID_BUILD_TOP/vendor/pa/tools/squisher.rm ]; then
-	for RM_FILE in `cat $ANDROID_BUILD_TOP/vendor/pa/tools/squisher.rm`; do
-		rm -f $REPACK/ota/$RM_FILE
-	done
+        for RM_FILE in `cat $ANDROID_BUILD_TOP/vendor/pa/tools/squisher.rm`; do
+                rm -f $REPACK/ota/$RM_FILE
+        done
 fi
 
 # Delete target product specific files
 if [ -f $ANDROID_BUILD_TOP/vendor/pa/tools/$TARGET_PRODUCT-squisher.rm ]; then
-	for RM_FILE in `cat $ANDROID_BUILD_TOP/vendor/pa/tools/$TARGET_PRODUCT-squisher.rm`; do
-		rm -f $REPACK/ota/$RM_FILE
-	done
+        for RM_FILE in `cat $ANDROID_BUILD_TOP/vendor/pa/tools/$TARGET_PRODUCT-squisher.rm`; do
+                rm -f $REPACK/ota/$RM_FILE
+        done
 fi
 
 # Delete unnecessary binaries
@@ -86,17 +87,17 @@ rm -rf $REPACK/ota/recovery
 
 # Strip modules
 [ -d $REPACK/ota/system/lib/modules ] && \
-	find $REPACK/ota/system/lib/modules -name "*.ko" -exec -0 arm-eabi-strip --strip-unneeded '{}' \;
+        find $REPACK/ota/system/lib/modules -name "*.ko" -exec -0 arm-eabi-strip --strip-unneeded '{}' \;
 
 # Determine what to name the new signed package
 if [ -z "$CYANOGEN_NIGHTLY" ]; then
-	PAVERSION=`grep 'ro.modversion=' $REPACK/ota/system/build.prop | sed -e 's/ro.modversion=//g'`
-	OVERLAYTARGET=`grep 'ro.pa.family=' $REPACK/ota/system/build.prop | sed -e 's/ro.pa.family=//g'`
-	: ${PAVERSION:=nightly}
-	OUTFILE=$OUT/$PAVERSION.zip
-	echo PAVERSION: $PAVERSION
+        PAVERSION=`grep 'ro.modversion=' $REPACK/ota/system/build.prop | sed -e 's/ro.modversion=//g'`
+        OVERLAYTARGET=`grep 'ro.pa.family=' $REPACK/ota/system/build.prop | sed -e 's/ro.pa.family=//g'`
+        : ${PAVERSION:=nightly}
+        OUTFILE=$OUT/$PAVERSION.zip
+        echo PAVERSION: $PAVERSION
 else
-	OUTFILE=$OUT/update-squished.zip
+        OUTFILE=$OUT/update-squished.zip
 fi
 
 # Copy ParanoidPreferences overlays
@@ -120,9 +121,13 @@ echo
 printf "Signing package..."
 SECURITYDIR=$ANDROID_BUILD_TOP/build/target/product/security
 java -Xmx1024m \
-	-jar $ANDROID_BUILD_TOP/out/host/$OUT_TARGET_HOST/framework/signapk.jar \
-	-w $SECURITYDIR/testkey.x509.pem $SECURITYDIR/testkey.pk8 \
-	$REPACK/update.zip $OUTFILE
+        -jar $ANDROID_BUILD_TOP/out/host/$OUT_TARGET_HOST/framework/signapk.jar \
+        -w $SECURITYDIR/testkey.x509.pem $SECURITYDIR/testkey.pk8 \
+        $REPACK/update.zip $OUTFILE
+echo
+printf "Cleaning up..."
+rm -rf $REPACK
+echo
 
 # Create a md5 checksum image of the repacked package
 (
@@ -130,81 +135,12 @@ img=`basename $OUTFILE`
 cd `dirname $OUTFILE`
 $MD5 $img >$img.md5sum
 echo
+echo "Package complete: $OUTFILE"
 cat $img.md5sum
 echo
 )
 
-# Get GAPPS
-wget 'http://goo.im/json2&path=/devs/paranoidandroid/roms/gapps&query=pa_gapps' -O $REPACK/goo.json
-NEWESTGAPPS=`cat $REPACK/goo.json | grep -P -o -e 'pa_gapps.*?.zip' -m 1 | head -1`
-
-echo
-printf "Fetching latest GAPPS..."
-echo
-(
-if [ -f $ANDROID_BUILD_TOP/gapps/$NEWESTGAPPS ];
-then
-    echo "Gapps package $NEWESTGAPPS found"
-    echo
-else
-    echo "Gapps package $NEWESTGAPPS not found, trying to download ..."
-    echo
-
-    rm -rf $ANDROID_BUILD_TOP/gapps
-    mkdir -p $ANDROID_BUILD_TOP/gapps
-    cd $ANDROID_BUILD_TOP/gapps
-    wget "http://goo.im/devs/paranoidandroid/roms/gapps/$NEWESTGAPPS"
-fi
-)
-
-# Create cache
-echo
-printf "Creating installer cache partition..."
-echo
-(
-mkdir $REPACK/cache
-mkdir $REPACK/cache/recovery
-echo --wipe_data > $REPACK/cache/recovery/command
-echo --update_package=CACHE:rom.zip >> $REPACK/cache/recovery/command
-echo --update_package=CACHE:gapps.zip >> $REPACK/cache/recovery/command
-echo --wipe_cache >> $REPACK/cache/recovery/command
-echo --wipe_dalvik >> $REPACK/cache/recovery/command
-cp $OUTFILE $REPACK/cache/rom.zip
-cp $ANDROID_BUILD_TOP/gapps/$NEWESTGAPPS $REPACK/cache/gapps.zip
-echo
-ls $REPACK/cache -sh
-echo
-printf "mkuserimg.sh $REPACK/cache $REPACK/cache.img ext4 tmp 500M"
-echo
-mkuserimg.sh $REPACK/cache $REPACK/cache.img ext4 /cache 500M
-rm -rf $REPACK/cache
-)
-
-# Zip cache image + MD5
-echo
-printf "Zipping installer cache partition..."
-echo
-(
-cd $REPACK
-echo "zip $QUIET $OUT/image_$PAVERSION.zip cache.img"
-echo
-zip $QUIET $OUT/image_$PAVERSION.zip cache.img
-$MD5 $OUT/image_$PAVERSION.zip >$OUT/image_$PAVERSION.zip.md5sum
-echo
-cat $OUT/image_$PAVERSION.zip.md5sum
-)
-
-echo
-printf "Cleaning up..."
-rm -rf $REPACK
-echo
-
-ls -sh $OUT
-echo
-
-echo "Package complete: $OUTFILE"
 echo $OUTFILE > $OUT/romPath
 echo $PAVERSION.zip > $OUT/romName
-echo
 
 exit 0
