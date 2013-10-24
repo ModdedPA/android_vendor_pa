@@ -44,7 +44,8 @@ endif
 PRODUCT_PACKAGES += \
     CMFileManager \
     Apollo \
-    DSPManager
+    DSPManager \
+    LockClock
 
 ifneq ($(PARANOID_BOOTANIMATION_NAME),)
     PRODUCT_COPY_FILES += \
