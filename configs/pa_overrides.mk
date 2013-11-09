@@ -15,6 +15,14 @@
 PRODUCT_PACKAGES += \
         Busybox
 
+# CM Stuff
+PRODUCT_PACKAGES += \
+        Superuser \
+        su \
+        Apollo \
+        CMFileManager
+
+
 # Source or prebuilt PA-prefs logic
 ifneq ($(PREFS_FROM_SOURCE),true)
     PRODUCT_COPY_FILES += \
