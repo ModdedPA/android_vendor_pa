@@ -17,8 +17,6 @@ PRODUCT_PACKAGES += \
 
 # CM Stuff
 PRODUCT_PACKAGES += \
-        Superuser \
-        su \
         Apollo \
         CMFileManager
 
